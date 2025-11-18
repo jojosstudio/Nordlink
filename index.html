@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>NordLink Discord Bot – Schnell. Klar. Verlässlich.</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <meta name="theme-color" content="#0b0f15">
+  <meta name="color-scheme" content="dark light">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <style>
+    :root{
+      --bg:#0b0f15; --text:#e9eef6; --muted:#9fb0c2;
+      --accent:#4d8de0; --border:rgba(255,255,255,0.14);
+      --glass:rgba(255,255,255,0.06); --blur:14px;
+    }
+    html,body{
+      height:100%; margin:0; color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 15% -10%, #132032, #0b0f15 50%),
+        radial-gradient(900px 400px at 100% 10%, rgba(77,141,224,.18), transparent 60%);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    }
+    a{ color: var(--accent); text-decoration: none; }
+    a:hover{ text-decoration: underline; }
+    .wrapper{ min-height:100dvh; display:flex; flex-direction:column; }
+    .nav{
+      position: sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(10,12,16,.55), rgba(10,12,16,.25), transparent);
+      border-bottom:1px solid var(--border);
+    }
+    .nav-inner{ display:flex; align-items:center; justify-content:space-between; max-width:1080px; margin:0 auto; padding:14px 20px; }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.3px; }
+    .brand-dot{ width:10px; height:10px; border-radius:50%; background:var(--accent); box-shadow: 0 0 24px rgba(77,141,224,.8), 0 0 8px rgba(77,141,224,.8) inset; }
+    .nav-actions{ display:flex; gap:10px; align-items:center; }
+    .btn, .chip{
+      border:1px solid var(--border); border-radius:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      color:var(--text); padding:10px 14px; font-weight:600; cursor:pointer;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .3s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 24px rgba(0,0,0,.35), 0 0 0 1px rgba(77,141,224,.15) inset; border-color: rgba(77,141,224,.35); }
+    .btn.acc{ background: linear-gradient(180deg, rgba(77,141,224,.25), rgba(77,141,224,.15)); border-color: rgba(77,141,224,.55); }
+    .chip{ font-size:12px; opacity:.9; }
+    .hero{ position:relative; display:grid; place-items:center; padding:64px 20px 32px; }
+    .hero-inner{ width:min(1080px, 94vw); display:grid; grid-template-columns: 1.05fr .95fr; gap:28px; align-items:center; }
+    @media (max-width: 900px){ .hero-inner{ grid-template-columns: 1fr; } }
+    .card{
+      border-radius:20px; border:1px solid var(--border);
+      background: linear-gradient(180deg, var(--glass), rgba(255,255,255,0.04));
+      backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    }
+    .hero-copy{ padding:26px; }
+    .kicker{ display:inline-flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); margin-bottom:10px; }
+    .kicker .dot{ width:6px; height:6px; border-radius:999px; background:var(--accent); box-shadow: 0 0 10px rgba(77,141,224,.9); }
+    h1{ margin:0 0 10px; font-size:34px; font-weight:900; letter-spacing:.2px; line-height:1.12; }
+    .sub{ margin:0 0 16px; color:var(--muted); font-size:14px; }
+    .hero-cta{ display:flex; gap:10px; margin-top:6px; flex-wrap:wrap; }
+    .visual{ position:relative; overflow:hidden; padding:0; min-height:280px; display:flex; align-items:stretch; justify-content:stretch; }
+    .visual-inner{ position:relative; width:100%; display:grid; place-items:center; padding:26px; }
+    .gradient-orb{
+      position:absolute; inset:-20%;
+      background:
+        radial-gradient(600px 300px at 20% 10%, rgba(77,141,224,.14), transparent 60%),
+        radial-gradient(500px 260px at 80% 30%, rgba(120,180,255,.10), transparent 60%),
+        radial-gradient(700px 360px at 50% 90%, rgba(255,140,200,.08), transparent 70%);
+      filter: blur(30px); transform: translateZ(0); animation: float 14s ease-in-out infinite; contain: content; will-change: transform;
+    }
+    @keyframes float{ 0%,100%{ transform: translateY(0) translateX(0); } 50%{ transform: translateY(-12px) translateX(8px); } }
+    .section{ padding:30px 20px; }
+    .container{ width:min(1080px, 94vw); margin:0 auto; }
+    .grid{ display:grid; gap:16px; grid-template-columns: repeat(3, 1fr); }
+    @media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
+    .tile{ position:relative; overflow:hidden; padding:20px; transform: translateY(12px); opacity:0; animation: rise .9s cubic-bezier(.2,.8,.2,1) forwards; animation-delay: var(--delay, 0s); }
+    @keyframes rise{ to{ transform: translateY(0); opacity:1; } }
+    .tile h3{ margin:0 0 6px; font-size:16px; letter-spacing:.2px; }
+    .tile p{ margin:0; font-size:13px; color:var(--muted); line-height:1.55; }
+    .icon{ width:34px; height:34px; border-radius:10px; display:grid; place-items:center; margin-bottom:10px;
+      background: linear-gradient(180deg, rgba(77,141,224,.25), rgba(77,141,224,.08));
+      border:1px solid rgba(77,141,224,.45);
+      box-shadow: 0 6px 18px rgba(77,141,224,.18) inset, 0 4px 14px rgba(0,0,0,.35);
+    }
+    .faq{ margin-top:8px; }
+    .faq-item{ border-radius:14px; border:1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03)); padding:14px 16px; }
+    .faq-q button{ width:100%; display:flex; align-items:center; justify-content:space-between; background:none; border:0; color:inherit; padding:0; cursor:pointer; }
+    .faq-q h4{ margin:0; font-size:14px; }
+    .faq-a{ color:var(--muted); font-size:13px; line-height:1.6; overflow:hidden; max-height:0; transition: max-height .35s ease; }
+    .faq-item.open .faq-a{ max-height:400px; }
+    .footer{ padding:28px 20px 40px; color:var(--muted); font-size:12px; text-align:center; }
+    .card:hover{ border-color: rgba(255,255,255,.22); }
+    .tile:hover{ border-color: rgba(77,141,224,.35); }
+    .btn:active{ transform: translateY(0); }
+    .parallax-hover{ transition: transform .35s cubic-bezier(.2,.8,.2,1); will-change: transform; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- NAV -->
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span>NordLink</span>
+      </div>
+      <div class="nav-actions">
+        <span class="chip">Klar • Schnell • Digital</span>
+        <button class="btn acc" onclick="scrollToId('modules')">Features</button>
+        <button class="btn" onclick="scrollToId('faq')">FAQ</button>
+        <a class="btn" href="https://discord.gg/DA8tE4whkm" target="_blank" rel="noopener">Support</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="card hero-copy parallax-hover" data-parallax="3">
+        <div class="kicker"><span class="dot"></span> Für Community‑Server</div>
+        <h1>NordLink Discord Bot<br/>Hilfe‑Wizard, Moderation & Status</h1>
+        <p class="sub">
+          Ein Bot, der deine Orga einfacher macht: klare Embeds, gut erklärte Slash‑Befehle
+          und Module für Welcome, RP‑Status, Warnsystem, Teamwarns, Ranks, Abmeldungen, No‑Ping und Tickets.
+        </p>
+        <div class="hero-cta">
+          <a class="btn acc" href="#modules" onclick="scrollToId('modules')">Module ansehen</a>
+          <a class="btn" href="#faq" onclick="scrollToId('faq')">Häufige Fragen</a>
+        </div>
+      </div>
+
+      <div class="card visual parallax-hover" data-parallax="6" aria-hidden="true">
+        <div class="visual-inner">
+          <div class="gradient-orb"></div>
+          <div class="card" style="padding:18px; border-radius:16px; max-width:460px; text-align:center; border:1px solid var(--border); background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));">
+            <div style="display:flex; gap:10px; justify-content:center; margin-bottom:10px;">
+              <div class="icon">⚡</div>
+              <div class="icon">🔧</div>
+              <div class="icon">🛡️</div>
+            </div>
+            <h3 style="margin:0 0 6px;">Schnell. Klar. Verlässlich.</h3>
+            <p style="margin:0; color:var(--muted); font-size:13px;">
+              Saubere Slash‑Befehle, rollenbasierte Admin‑Sicht und sinnvolle Defaults.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODULE GRID -->
+  <section class="section" id="modules">
+    <div class="container">
+      <div class="grid">
+        <div class="card tile" style="--delay:.05s">
+          <div class="icon">👋</div>
+          <h3>Welcome</h3>
+          <p>Willkommens‑Embed, optional Banner, Join‑Rolle. Platzhalter: {user}, {username}, {server}, {membercount}.</p>
+        </div>
+        <div class="card tile" style="--delay:.15s">
+          <div class="icon">📡</div>
+          <h3>RP‑Status</h3>
+          <p>Instanzen mit Namen/Code, Statuskanal „offen/stop“, Templates für Kanalnamen.</p>
+        </div>
+        <div class="card tile" style="--delay:.25s">
+          <div class="icon">⚠️</div>
+          <h3>Warnsystem</h3>
+          <p>Verwarnungen mit DM und Eskalation ab jeder 3. Verwarnung.</p>
+        </div>
+        <div class="card tile" style="--delay:.35s">
+          <div class="icon">👥</div>
+          <h3>Teamwarn</h3>
+          <p>Interne Verwarnungen, DM an Teammitglied, Eskalations‑Ping bei Schwelle.</p>
+        </div>
+        <div class="card tile" style="--delay:.45s">
+          <div class="icon">🎭</div>
+          <h3>Rank</h3>
+          <p>Up/Down, Team‑Kick, geschützte Rollen und Operator‑Rolle.</p>
+        </div>
+        <div class="card tile" style="--delay:.55s">
+          <div class="icon">📆</div>
+          <h3>Abmeldung</h3>
+          <p>Einmalig oder wiederkehrend (Montag 18–21 Uhr). Review und Entscheidungen per Slash.</p>
+        </div>
+        <div class="card tile" style="--delay:.65s">
+          <div class="icon">🔕</div>
+          <h3>No‑Ping</h3>
+          <p>No‑Ping‑Liste, @here/@everyone Regeln, Timeouts und Schwelle → Warnsystem.</p>
+        </div>
+        <div class="card tile" style="--delay:.75s">
+          <div class="icon">🎫</div>
+          <h3>Tickets</h3>
+          <p>Ticket‑Panel, Nutzer hinzufügen/entfernen, Verantwortung übertragen.</p>
+        </div>
+        <div class="card tile" style="--delay:.85s">
+          <div class="icon">🆘</div>
+          <h3>Support</h3>
+          <p>Support‑Server und einfache Hilfe direkt im Bot.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMANDS DETAILS (Accordion per module) -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="kicker"><span class="dot"></span> Commands & Antworten</div>
+      <h2 style="margin:6px 0 10px; font-size:20px;">Was kann der Bot?</h2>
+      <div class="faq">
+
+        <!-- Welcome -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-welcome">
+              <h4>Welcome – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-welcome" class="faq-a" role="region" aria-hidden="true">
+            <p>• /welcomesetup setchannel channel:&lt;#kanal&gt;<br/>
+               • /welcomesetup setmessage message:&lt;Text&gt;<br/>
+               • /welcomesetup toggleimages on:&lt;true|false&gt;<br/>
+               • /welcomesetup setjoinrole role:&lt;@Rolle&gt;<br/>
+               • /welcomesetup clearjoinrole</p>
+          </div>
+        </div>
+
+        <!-- RP -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-rp">
+              <h4>RP – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-rp" class="faq-a" role="region" aria-hidden="true">
+            <p>• /rp create code_key:&lt;id&gt; server_name:&lt;Text&gt; server_code:&lt;Text&gt; [beschreibung:&lt;Text&gt;]<br/>
+               • /rp start code_key:&lt;id&gt; / /rp stop code_key:&lt;id&gt;<br/>
+               • /rp delete code_key:&lt;id&gt;<br/>
+               • /rp status code_key:&lt;id&gt;<br/>
+               • /rp list<br/>
+               • /rp setnames code_key:&lt;id&gt; open_tpl:&lt;Text&gt; stop_tpl:&lt;Text&gt;<br/>
+               • /rp shownames code_key:&lt;id&gt;</p>
+          </div>
+        </div>
+
+        <!-- Teamwarn -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-teamwarn">
+              <h4>Teamwarn – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-teamwarn" class="faq-a" role="region" aria-hidden="true">
+            <p>• /teamwarn member:&lt;@User&gt; reason:&lt;Text&gt;<br/>
+               • /teamwarns [member:&lt;@User&gt;]<br/>
+               • /teamwarnlist [limit:&lt;1-25&gt;]<br/>
+               • /teamunwarn member:&lt;@User&gt; [reason:&lt;Text&gt;]<br/>
+               • /teamclearwarns member:&lt;@User&gt; [reason:&lt;Text&gt;]<br/>
+               Config: /teamwarnconfig setlog, setadminrole</p>
+          </div>
+        </div>
+
+        <!-- Warn -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-warn">
+              <h4>Warn – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-warn" class="faq-a" role="region" aria-hidden="true">
+            <p>• /warn member:&lt;@User&gt; [reason:&lt;Text&gt;]<br/>
+               • /warns [member:&lt;@User&gt;]<br/>
+               • /warnlist [limit:&lt;1-25&gt;]<br/>
+               • /unwarn member:&lt;@User&gt; [reason:&lt;Text&gt;]<br/>
+               • /warnclear member:&lt;@User&gt; [reason:&lt;Text&gt;]<br/>
+               Config: /warnconfig set-log, set-admin-role</p>
+          </div>
+        </div>
+
+        <!-- Rank -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-rank">
+              <h4>Rank – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-rank" class="faq-a" role="region" aria-hidden="true">
+            <p>• /rank up member:&lt;@User&gt; old_role:&lt;@Rolle&gt; new_role:&lt;@Rolle&gt; [reason:&lt;Text&gt;]<br/>
+               • /rank down member:&lt;@User&gt; old_role:&lt;@Rolle&gt; new_role:&lt;@Rolle&gt; [reason:&lt;Text&gt;]<br/>
+               • /rank team_kick member:&lt;@User&gt; [reason:&lt;Text&gt;]<br/>
+               Config: /rankconfig set-log, set-ping-role, set-admin-role, set-citizen-role, set-rank-role, view</p>
+          </div>
+        </div>
+
+        <!-- Abmeldung -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-abmeldung">
+              <h4>Abmeldung – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-abmeldung" class="faq-a" role="region" aria-hidden="true">
+            <p>• /abmelden bis:&lt;Zeit&gt; [grund:&lt;Text&gt;]<br/>
+               • /abmeldung dauer wochentag:&lt;Mo|Di|...&gt; [von:&lt;HH:MM&gt;] [bis:&lt;HH:MM&gt;] [grund:&lt;Text&gt;]<br/>
+               • /abmeldung anmelden [welche:&lt;dauer:&lt;index&gt;&gt;]<br/>
+               • /abmeldung liste / liste-alle / liste-aktiv<br/>
+               Admin: /abmeldungadmin review, entscheid, remove<br/>
+               Config: /abmeldungconfig set-log, set-admin-role, clear-admin-role</p>
+          </div>
+        </div>
+
+        <!-- No-Ping -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-noping">
+              <h4>No‑Ping – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-noping" class="faq-a" role="region" aria-hidden="true">
+            <p>• /nopingsetup adduser user:&lt;@User&gt; / removeuser<br/>
+               • /nopingsetup list<br/>
+               • /nopingsetup toggleviablehereeveryone on:&lt;true|false&gt;<br/>
+               • /nopingsetup toggle-bypass member:&lt;@User&gt; on:&lt;true|false&gt;<br/>
+               • /nopingsetup show<br/>
+               Config: setthreshold, setwindow, settimeoutbase, settimeoutwarn, setlog</p>
+          </div>
+        </div>
+
+        <!-- Tickets -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-tickets">
+              <h4>Tickets – Befehle</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-tickets" class="faq-a" role="region" aria-hidden="true">
+            <p>Admin: • /ticket add &lt;@User&gt; • /ticket remove &lt;@User&gt; • /ticket transfer &lt;@User&gt;<br/>
+               Config: • /ticketsetup createpanel • sendpanel • updatepanel • showpanels</p>
+          </div>
+        </div>
+
+        <!-- Support -->
+        <div class="faq-item">
+          <div class="faq-q">
+            <button class="faq-toggle" aria-expanded="false" aria-controls="faq-support">
+              <h4>Support</h4><span aria-hidden="true">＋</span>
+            </button>
+          </div>
+          <div id="faq-support" class="faq-a" role="region" aria-hidden="true">
+            <p>🔧 Du brauchst Hilfe oder hast Feedback? Komm auf den Support‑Server: <a href="https://discord.gg/DA8tE4whkm" target="_blank" rel="noopener">discord.gg/DA8tE4whkm</a></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="container card" style="padding:20px; text-align:center;">
+      <h3 style="margin:0 0 6px;">Den Bot ausprobieren?</h3>
+      <p class="sub" style="margin-bottom:12px;">Hol dir den NordLink Bot auf deinen Server oder frage im Support nach einer Demo.</p>
+      <div class="hero-cta" style="justify-content:center;">
+        <a class="btn acc" href="#" id="invite-btn">Bot einladen</a>
+        <a class="btn" href="https://discord.gg/DA8tE4whkm" target="_blank" rel="noopener">Support öffnen</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    © 2025 NordLink • Made for communities with ❤️
+  </footer>
+</div>
+
+<script>
+function scrollToId(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const headerOffset = 64;
+  const y = el.getBoundingClientRect().top + window.scrollY - headerOffset;
+  window.scrollTo({ top: y, behavior: 'smooth' });
+}
+
+// Parallax hover
+document.querySelectorAll('.parallax-hover').forEach(el=>{
+  const strength = Number(el.dataset.parallax||4);
+  el.addEventListener('mousemove', e=>{
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - .5;
+    const y = (e.clientY - rect.top) / rect.height - .5;
+    el.style.transform = `perspective(800px) rotateY(${x*strength}deg) rotateX(${ -y*strength }deg) translateY(-1px)`;
+  });
+  el.addEventListener('mouseleave', ()=>{
+    el.style.transform = `perspective(800px) rotateY(0) rotateX(0)`;
+  });
+});
+
+// Accordion A11y
+document.querySelectorAll('.faq-item').forEach(item=>{
+  const btn = item.querySelector('.faq-toggle');
+  const answer = item.querySelector('.faq-a');
+  btn.addEventListener('click', ()=>{
+    const open = item.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+    answer.setAttribute('aria-hidden', String(!open));
+  });
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.style.animationPlayState = 'running';
+      entry.target.style.willChange = 'auto';
+      observer.unobserve(entry.target);
+    }
+  });
+},{ threshold: 0.18 });
+document.querySelectorAll('.tile').forEach(t=>observer.observe(t));
+
+// Optional: Bot Invite Link (füge hier deine Client-ID ein)
+document.getElementById('invite-btn').addEventListener('click', ()=>{
+  const clientId = 'DEINE_CLIENT_ID'; // ToDo
+  const perms = '268487680'; // Bsp: Manage Roles, Send Messages, View Channels etc. anpassen
+  const scopes = 'bot%20applications.commands';
+  const url = `https://discord.com/oauth2/authorize?client_id=${clientId}&permissions=${perms}&scope=${scopes}`;
+  window.open(url, '_blank', 'noopener');
+});
+
+// Service Worker registrieren
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('/sw.js'));
+}
+</script>
+</body>
+</html>
